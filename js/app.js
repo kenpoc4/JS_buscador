@@ -28,7 +28,7 @@ const datosBusqueda = {
 document.addEventListener( 'DOMContentLoaded', (  ) => {
 
     // Muestra los autos al cargar
-    mostrarAutos(  );
+    mostrarAutos( autos );
 
     // Llena las opciones de años
     llenarSelect(  );
@@ -51,26 +51,44 @@ year.addEventListener( 'change', e => {
 minimo.addEventListener( 'change', e => {
 
     datosBusqueda.minimo = e.target.value;
+
+    // Filtrando autos
+    filtrarAuto(  );
 } );
 maximo.addEventListener( 'change', e => {
 
     datosBusqueda.maximo = e.target.value;
+
+    // Filtrando autos
+    filtrarAuto(  );
 } );
 puertas.addEventListener( 'change', e => {
 
-    datosBusqueda.puertas = e.target.value;
+    datosBusqueda.puertas = parseInt(e.target.value);
+
+    // Filtrando autos
+    filtrarAuto(  );
 } );
 transmision.addEventListener( 'change', e => {
 
     datosBusqueda.transmision = e.target.value;
+
+    // Filtrando autos
+    filtrarAuto(  );
 } );
 color.addEventListener( 'change', e => {
 
     datosBusqueda.color = e.target.value;
+
+    // Filtrando autos
+    filtrarAuto(  );
 } );
 
 // Funciones
-function mostrarAutos(  ) {
+function mostrarAutos( autos ) {
+
+    // Elimina el HTML previo
+    limpiarHTML(  );
 
     autos.forEach( auto => {
         
@@ -84,6 +102,14 @@ function mostrarAutos(  ) {
         // Insertar en el HTML
         resultado.appendChild( autoHTML );
     });
+}
+// Limpiar HTML 
+function limpiarHTML(  ) {
+
+    while( resultado.firstChild ) {
+
+        resultado.removeChild( resultado.firstChild );
+    }
 }
 
 // Genera los años del select
@@ -103,8 +129,26 @@ function llenarSelect(  ) {
 // Función que fintra en base a la búsqueda
 function filtrarAuto(  ) {
 
-    const resultado = autos.filter( filtrarMarca ).filter( filtrarYear );
-    console.log(resultado);
+    const resultado = autos.filter( filtrarMarca ).filter( filtrarYear ).filter( filtrarMinimo ).filter( filtrarMaximo ).filter( filtrarPorPuertas ).filter( filtrarPorTransmision ).filter( filtrarPorColor );
+    
+    if( resultado.length ) {
+
+        mostrarAutos( resultado );
+    } else {
+
+        noResultado(  );
+    }
+}
+function noResultado(  ) {
+
+    // Limpiando el HTML
+    limpiarHTML(  );
+
+    const noResultado = document.createElement( 'div' );
+    noResultado.classList.add( 'alerta', 'error' );
+    noResultado.textContent = 'No hay resultados';
+
+    resultado.appendChild( noResultado );
 }
 function filtrarMarca( auto ) {
 
@@ -121,6 +165,51 @@ function filtrarYear( auto ) {
     if( year ) {
 
         return auto.year === year;
+    }
+    return auto;
+}
+function filtrarMinimo( auto ) {
+
+    const { minimo } = datosBusqueda;
+    if( minimo ) {
+
+        return auto.precio >= minimo;
+    }
+    return auto;
+}
+function filtrarMaximo( auto ) {
+
+    const { maximo } = datosBusqueda;
+    if( maximo ) {
+
+        return auto.precio <= maximo;
+    }
+    return auto;
+}
+function filtrarPorPuertas( auto ) {
+
+    const { puertas } = datosBusqueda;
+    if( puertas ) {
+
+        return auto.puertas === puertas;
+    }
+    return auto;
+}
+function filtrarPorTransmision( auto ) {
+
+    const { transmision } = datosBusqueda;
+    if( transmision ) {
+
+        return auto.transmision === transmision;
+    }
+    return auto;
+}
+function filtrarPorColor( auto ) {
+
+    const { color } = datosBusqueda;
+    if( color ) {
+
+        return auto.color === color;
     }
     return auto;
 }
